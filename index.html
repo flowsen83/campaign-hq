@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,13 +28,11 @@
       letter-spacing: 3px;
     }
 
-    header p {
-      color: #c9c9c9;
-    }
+    header p { color: #c9c9c9; }
 
     main {
-      max-width: 520px;
-      margin: 40px auto;
+      max-width: 560px;
+      margin: 35px auto;
       padding: 0 16px;
     }
 
@@ -43,11 +41,10 @@
       border: 1px solid #b69a62;
       border-radius: 12px;
       padding: 24px;
+      margin-bottom: 18px;
     }
 
-    h2 {
-      margin-top: 0;
-    }
+    h2 { margin-top: 0; }
 
     label {
       display: block;
@@ -83,8 +80,13 @@
       cursor: wait;
     }
 
+    .secondary {
+      background: #414c5a;
+      color: white;
+    }
+
     .status {
-      margin-top: 18px;
+      margin-top: 16px;
       line-height: 1.5;
       overflow-wrap: anywhere;
     }
@@ -95,10 +97,10 @@
     .hidden { display: none; }
 
     .note {
-      margin-top: 22px;
       color: #b9bec6;
       font-size: 13px;
       text-align: center;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -111,15 +113,45 @@
 
   <main>
     <section class="card">
+      <h2>Join Campaign</h2>
+      <p>Enter your player name and campaign code.</p>
 
-      <h2>Admin-Zugang</h2>
+      <form id="joinForm">
+        <label for="playerName">Player Name</label>
+        <input
+          id="playerName"
+          type="text"
+          maxlength="40"
+          autocomplete="nickname"
+          required
+        >
+
+        <label for="campaignCode">Campaign Code</label>
+        <input
+          id="campaignCode"
+          type="text"
+          maxlength="40"
+          autocapitalize="characters"
+          required
+        >
+
+        <button id="joinButton" type="submit">
+          Join Campaign
+        </button>
+      </form>
+
+      <p id="joinMessage" class="status" role="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>Administrator</h2>
 
       <p id="connectionStatus" class="status">
-        Firebase wird geladen ...
+        Connecting to Firebase...
       </p>
 
       <form id="loginForm" class="hidden">
-        <label for="email">E-Mail-Adresse</label>
+        <label for="email">Email Address</label>
         <input
           id="email"
           type="email"
@@ -127,7 +159,7 @@
           required
         >
 
-        <label for="password">Passwort</label>
+        <label for="password">Password</label>
         <input
           id="password"
           type="password"
@@ -136,25 +168,23 @@
         >
 
         <button id="loginButton" type="submit">
-          Anmelden
+          Admin Login
         </button>
       </form>
 
       <div id="accountPanel" class="hidden">
         <p id="accountInfo" class="status"></p>
-        <button id="logoutButton" type="button">
-          Abmelden
+        <button id="logoutButton" class="secondary" type="button">
+          Sign Out
         </button>
       </div>
 
-      <p id="message" class="status" role="status"></p>
-
+      <p id="adminMessage" class="status" role="status"></p>
     </section>
 
     <p class="note">
-      Campaign HQ – Erste Testversion
-      <br>
-      Kampagnenverwaltung folgt.
+      Campaign HQ – Development Version<br>
+      Campaign management is coming soon.
     </p>
   </main>
 
@@ -166,6 +196,7 @@
       getAuth,
       onAuthStateChanged,
       signInWithEmailAndPassword,
+      signInAnonymously,
       signOut
     } from
       "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
@@ -182,102 +213,112 @@
 
     const ADMIN_UID = "rAl5A3mqGaZytHCImO6jxRKCtq92";
 
-    const connectionStatus =
-      document.getElementById("connectionStatus");
-
-    const loginForm =
-      document.getElementById("loginForm");
-
-    const accountPanel =
-      document.getElementById("accountPanel");
-
-    const accountInfo =
-      document.getElementById("accountInfo");
-
-    const message =
-      document.getElementById("message");
-
-    const loginButton =
-      document.getElementById("loginButton");
-
-    const logoutButton =
-      document.getElementById("logoutButton");
+    const $ = (id) => document.getElementById(id);
 
     try {
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
 
-      connectionStatus.textContent =
-        "Firebase geladen. Anmeldung bereit.";
-
-      connectionStatus.className =
+      $("connectionStatus").textContent =
+        "Firebase connected.";
+      $("connectionStatus").className =
         "status success";
 
       onAuthStateChanged(auth, (user) => {
-        message.textContent = "";
+        $("adminMessage").textContent = "";
 
         if (user && !user.isAnonymous) {
-          loginForm.classList.add("hidden");
-          accountPanel.classList.remove("hidden");
+          $("loginForm").classList.add("hidden");
+          $("accountPanel").classList.remove("hidden");
 
-          if (user.uid === ADMIN_UID) {
-            accountInfo.textContent =
-              "Admin-Konto erkannt: " + user.email;
-          } else {
-            accountInfo.textContent =
-              "Angemeldet ohne Admin-Berechtigung.";
-          }
+          $("accountInfo").textContent =
+            user.uid === ADMIN_UID
+              ? "Administrator signed in: " + user.email
+              : "Signed in without administrator permissions.";
         } else {
-          accountPanel.classList.add("hidden");
-          loginForm.classList.remove("hidden");
+          $("accountPanel").classList.add("hidden");
+          $("loginForm").classList.remove("hidden");
         }
       });
 
-      loginForm.addEventListener("submit", async (event) => {
+      $("loginForm").addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        const email =
-          document.getElementById("email").value.trim();
+        const email = $("email").value.trim();
+        const password = $("password").value;
 
-        const password =
-          document.getElementById("password").value;
-
-        loginButton.disabled = true;
-        message.textContent = "Anmeldung läuft ...";
-        message.className = "status";
+        $("loginButton").disabled = true;
+        $("adminMessage").textContent = "Signing in...";
+        $("adminMessage").className = "status";
 
         try {
-          await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+          await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
-          message.textContent =
-            "Anmeldung fehlgeschlagen. Bitte E-Mail und Passwort prüfen.";
-
-          message.className = "status error";
+          $("adminMessage").textContent =
+            "Sign-in failed. Please check your email and password.";
+          $("adminMessage").className = "status error";
         } finally {
-          loginButton.disabled = false;
-          document.getElementById("password").value = "";
+          $("loginButton").disabled = false;
+          $("password").value = "";
         }
       });
 
-      logoutButton.addEventListener("click", async () => {
+      $("logoutButton").addEventListener("click", async () => {
         try {
           await signOut(auth);
         } catch (error) {
-          message.textContent =
-            "Abmeldung fehlgeschlagen.";
-          message.className = "status error";
+          $("adminMessage").textContent = "Sign-out failed.";
+          $("adminMessage").className = "status error";
+        }
+      });
+
+      $("joinForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = $("playerName").value.trim();
+        const code = $("campaignCode").value.trim().toUpperCase();
+
+        if (!name || !code) {
+          $("joinMessage").textContent =
+            "Please enter your name and campaign code.";
+          $("joinMessage").className = "status error";
+          return;
+        }
+
+        $("joinButton").disabled = true;
+        $("joinMessage").textContent = "Preparing player access...";
+        $("joinMessage").className = "status";
+
+        try {
+          if (auth.currentUser &&
+              !auth.currentUser.isAnonymous) {
+            $("joinMessage").textContent =
+              "Please sign out of the administrator account before joining as a player.";
+            $("joinMessage").className = "status error";
+            return;
+          }
+
+          if (!auth.currentUser) {
+            await signInAnonymously(auth);
+          }
+
+          $("joinMessage").textContent =
+            "Player access ready. Campaign joining is not available yet.";
+          $("joinMessage").className = "status success";
+
+        } catch (error) {
+          $("joinMessage").textContent =
+            "Player sign-in failed. Please try again.";
+          $("joinMessage").className = "status error";
+        } finally {
+          $("joinButton").disabled = false;
         }
       });
 
     } catch (error) {
-      connectionStatus.textContent =
-        "Firebase konnte nicht gestartet werden.";
-
-      connectionStatus.className = "status error";
+      $("connectionStatus").textContent =
+        "Firebase initialization failed.";
+      $("connectionStatus").className = "status error";
     }
   </script>
 </body>
