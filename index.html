@@ -3,41 +3,106 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Campaign HQ</title>
+
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       background: #171c23;
       color: #f5f5f5;
       font-family: Arial, sans-serif;
-      text-align: center;
     }
+
     header {
       background: #252d38;
-      padding: 35px 15px;
+      padding: 32px 16px;
+      text-align: center;
       border-bottom: 3px solid #b69a62;
     }
+
     h1 {
       margin: 0;
       letter-spacing: 3px;
     }
-    main {
-      padding: 45px 20px;
+
+    header p {
+      color: #c9c9c9;
     }
+
+    main {
+      max-width: 520px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+
     .card {
-      max-width: 420px;
-      margin: auto;
-      padding: 25px;
       background: #252d38;
       border: 1px solid #b69a62;
       border-radius: 12px;
+      padding: 24px;
     }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border-radius: 7px;
+      border: 1px solid #68717c;
+      background: #171c23;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 7px;
+      background: #b69a62;
+      color: #171c23;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
     .status {
-      color: #b9d8a2;
+      margin-top: 18px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .success { color: #b9d8a2; }
+    .error { color: #ff9b9b; }
+
+    .hidden { display: none; }
+
+    .note {
+      margin-top: 22px;
+      color: #b9bec6;
+      font-size: 13px;
+      text-align: center;
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>CAMPAIGN HQ</h1>
@@ -45,12 +110,175 @@
   </header>
 
   <main>
-    <div class="card">
-      <h2>Willkommen im Campaign HQ</h2>
-      <p>Deine zentrale Plattform für Tabletop-Kampagnen.</p>
-      <p class="status">System bereit</p>
-      <p>Die Kampagnenauswahl folgt in Kürze.</p>
-    </div>
+    <section class="card">
+
+      <h2>Admin-Zugang</h2>
+
+      <p id="connectionStatus" class="status">
+        Firebase wird geladen ...
+      </p>
+
+      <form id="loginForm" class="hidden">
+        <label for="email">E-Mail-Adresse</label>
+        <input
+          id="email"
+          type="email"
+          autocomplete="username"
+          required
+        >
+
+        <label for="password">Passwort</label>
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button id="loginButton" type="submit">
+          Anmelden
+        </button>
+      </form>
+
+      <div id="accountPanel" class="hidden">
+        <p id="accountInfo" class="status"></p>
+        <button id="logoutButton" type="button">
+          Abmelden
+        </button>
+      </div>
+
+      <p id="message" class="status" role="status"></p>
+
+    </section>
+
+    <p class="note">
+      Campaign HQ – Erste Testversion
+      <br>
+      Kampagnenverwaltung folgt.
+    </p>
   </main>
+
+  <script type="module">
+    import { initializeApp } from
+      "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signOut
+    } from
+      "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZRTF-fjOZu4uKJy9OPMb27ZLWRNNmVts",
+      authDomain: "campaign-hq-12765.firebaseapp.com",
+      databaseURL: "https://campaign-hq-12765-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "campaign-hq-12765",
+      storageBucket: "campaign-hq-12765.firebasestorage.app",
+      messagingSenderId: "488850135352",
+      appId: "1:488850135352:web:ca42961977f50ed9a889cd"
+    };
+
+    const ADMIN_UID = "rAl5A3mqGaZytHCImO6jxRKCtq92";
+
+    const connectionStatus =
+      document.getElementById("connectionStatus");
+
+    const loginForm =
+      document.getElementById("loginForm");
+
+    const accountPanel =
+      document.getElementById("accountPanel");
+
+    const accountInfo =
+      document.getElementById("accountInfo");
+
+    const message =
+      document.getElementById("message");
+
+    const loginButton =
+      document.getElementById("loginButton");
+
+    const logoutButton =
+      document.getElementById("logoutButton");
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      connectionStatus.textContent =
+        "Firebase geladen. Anmeldung bereit.";
+
+      connectionStatus.className =
+        "status success";
+
+      onAuthStateChanged(auth, (user) => {
+        message.textContent = "";
+
+        if (user && !user.isAnonymous) {
+          loginForm.classList.add("hidden");
+          accountPanel.classList.remove("hidden");
+
+          if (user.uid === ADMIN_UID) {
+            accountInfo.textContent =
+              "Admin-Konto erkannt: " + user.email;
+          } else {
+            accountInfo.textContent =
+              "Angemeldet ohne Admin-Berechtigung.";
+          }
+        } else {
+          accountPanel.classList.add("hidden");
+          loginForm.classList.remove("hidden");
+        }
+      });
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const email =
+          document.getElementById("email").value.trim();
+
+        const password =
+          document.getElementById("password").value;
+
+        loginButton.disabled = true;
+        message.textContent = "Anmeldung läuft ...";
+        message.className = "status";
+
+        try {
+          await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+        } catch (error) {
+          message.textContent =
+            "Anmeldung fehlgeschlagen. Bitte E-Mail und Passwort prüfen.";
+
+          message.className = "status error";
+        } finally {
+          loginButton.disabled = false;
+          document.getElementById("password").value = "";
+        }
+      });
+
+      logoutButton.addEventListener("click", async () => {
+        try {
+          await signOut(auth);
+        } catch (error) {
+          message.textContent =
+            "Abmeldung fehlgeschlagen.";
+          message.className = "status error";
+        }
+      });
+
+    } catch (error) {
+      connectionStatus.textContent =
+        "Firebase konnte nicht gestartet werden.";
+
+      connectionStatus.className = "status error";
+    }
+  </script>
 </body>
 </html>
