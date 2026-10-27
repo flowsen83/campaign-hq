@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,9 +8,7 @@
   <title>Campaign HQ</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -30,9 +29,7 @@
       letter-spacing: 3px;
     }
 
-    header p {
-      color: #c9c9c9;
-    }
+    header p { color: #c9c9c9; }
 
     main {
       max-width: 560px;
@@ -48,9 +45,7 @@
       margin-bottom: 18px;
     }
 
-    h2 {
-      margin-top: 0;
-    }
+    h2 { margin-top: 0; }
 
     label {
       display: block;
@@ -59,8 +54,7 @@
       font-weight: bold;
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       padding: 13px;
       border-radius: 9px;
@@ -70,16 +64,14 @@
       font-size: 16px;
     }
 
-    select {
-      cursor: pointer;
-    }
-
     input:focus,
     select:focus,
     button:focus-visible {
       outline: 3px solid #f3d895;
       outline-offset: 2px;
     }
+
+    select { cursor: pointer; }
 
     button {
       width: 100%;
@@ -112,7 +104,7 @@
 
     .secondary {
       background: #52657a;
-      color: #ffffff;
+      color: white;
       border-color: #91a5bb;
     }
 
@@ -126,17 +118,9 @@
       overflow-wrap: anywhere;
     }
 
-    .success {
-      color: #b9d8a2;
-    }
-
-    .error {
-      color: #ff9b9b;
-    }
-
-    .hidden {
-      display: none;
-    }
+    .success { color: #b9d8a2; }
+    .error { color: #ff9b9b; }
+    .hidden { display: none; }
 
     .code {
       font-size: 24px;
@@ -144,6 +128,25 @@
       letter-spacing: 2px;
       color: #b9d8a2;
       overflow-wrap: anywhere;
+    }
+
+    .campaign-details {
+      background: #171c23;
+      border: 1px solid #52657a;
+      border-radius: 9px;
+      padding: 16px;
+      line-height: 1.7;
+      margin-top: 16px;
+    }
+
+    .campaign-details p {
+      margin: 5px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .player-list {
+      padding-left: 22px;
+      line-height: 1.9;
     }
 
     .note {
@@ -164,7 +167,7 @@
 
 <main>
 
-  <section class="card">
+  <section id="joinPanel" class="card">
     <h2>Join Campaign</h2>
     <p>Enter your player name and campaign code.</p>
 
@@ -173,6 +176,7 @@
       <input
         id="playerName"
         maxlength="40"
+        autocomplete="nickname"
         required
       >
 
@@ -190,6 +194,42 @@
     </form>
 
     <p id="joinMessage" class="status" role="status"></p>
+  </section>
+
+  <section id="campaignPanel" class="card hidden">
+    <h2>Campaign Overview</h2>
+
+    <div class="campaign-details">
+      <p>
+        <strong>Campaign:</strong>
+        <span id="activeCampaignName"></span>
+      </p>
+      <p>
+        <strong>Game Mode:</strong>
+        <span id="activeCampaignMode"></span>
+      </p>
+      <p>
+        <strong>Campaign Code:</strong>
+        <span id="activeCampaignCode"></span>
+      </p>
+      <p>
+        <strong>Playing as:</strong>
+        <span id="activePlayerName"></span>
+      </p>
+    </div>
+
+    <h3>Players</h3>
+    <ul id="playerList" class="player-list"></ul>
+
+    <p id="campaignMessage" class="status" role="status"></p>
+
+    <button
+      id="leaveCampaignButton"
+      class="secondary"
+      type="button"
+    >
+      Leave Campaign View
+    </button>
   </section>
 
   <section class="card">
@@ -308,6 +348,10 @@
   import {
     getDatabase,
     ref,
+    get,
+    set,
+    onValue,
+    off,
     runTransaction
   } from
     "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
@@ -330,14 +374,291 @@
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  $("connectionStatus").textContent =
-    "Firebase initialized.";
+  let activeCampaignCode = null;
+  let activeCampaignRef = null;
+  let activeCampaignListener = null;
+  let restoringSession = false;
 
-  $("connectionStatus").className =
-    "status success";
+  const campaignNames = {
+    "battle-of-the-bulge": "Battle of the Bulge",
+    "stalingrad": "Stalingrad"
+  };
 
-  onAuthStateChanged(auth, (user) => {
+  function displayMode(mode) {
+    return mode === "historical"
+      ? "Historical Mode"
+      : "Dynamic Mode";
+  }
 
+  function showMessage(id, message, isError = false) {
+    $(id).textContent = message;
+    $(id).className = isError
+      ? "status error"
+      : "status success";
+  }
+
+  function stopCampaignListener() {
+    if (activeCampaignRef && activeCampaignListener) {
+      off(activeCampaignRef, "value", activeCampaignListener);
+    }
+
+    activeCampaignRef = null;
+    activeCampaignListener = null;
+    activeCampaignCode = null;
+  }
+
+  function closeCampaignView() {
+    stopCampaignListener();
+
+    $("campaignPanel").classList.add("hidden");
+    $("joinPanel").classList.remove("hidden");
+    $("playerList").replaceChildren();
+    $("campaignMessage").textContent = "";
+  }
+
+  function renderPlayers(players) {
+    const list = $("playerList");
+    list.replaceChildren();
+
+    const names = Object.values(players || {})
+      .map(player => player && player.name)
+      .filter(name => typeof name === "string")
+      .sort((a, b) =>
+        a.localeCompare(b, "en", {
+          sensitivity: "base"
+        })
+      );
+
+    if (names.length === 0) {
+      const item = document.createElement("li");
+      item.textContent = "No players yet.";
+      list.appendChild(item);
+      return;
+    }
+
+    for (const name of names) {
+      const item = document.createElement("li");
+      item.textContent = name;
+      list.appendChild(item);
+    }
+  }
+
+  function openCampaign(code, playerName) {
+    closeCampaignView();
+
+    activeCampaignCode = code;
+    activeCampaignRef = ref(db, "campaigns/" + code);
+
+    $("activeCampaignCode").textContent = code;
+    $("activePlayerName").textContent = playerName;
+
+    $("joinPanel").classList.add("hidden");
+    $("campaignPanel").classList.remove("hidden");
+
+    showMessage(
+      "campaignMessage",
+      "Loading campaign..."
+    );
+
+    const currentRef = activeCampaignRef;
+
+    activeCampaignListener = onValue(
+      currentRef,
+      snapshot => {
+        if (activeCampaignRef !== currentRef) {
+          return;
+        }
+
+        if (!snapshot.exists()) {
+          showMessage(
+            "campaignMessage",
+            "This campaign no longer exists.",
+            true
+          );
+          return;
+        }
+
+        const campaign = snapshot.val();
+
+        $("activeCampaignName").textContent =
+          campaignNames[campaign.type] ||
+          campaign.type ||
+          "Unknown Campaign";
+
+        $("activeCampaignMode").textContent =
+          displayMode(campaign.mode);
+
+        renderPlayers(campaign.players);
+
+        showMessage(
+          "campaignMessage",
+          "Campaign synchronized."
+        );
+      },
+      error => {
+        if (activeCampaignRef !== currentRef) {
+          return;
+        }
+
+        showMessage(
+          "campaignMessage",
+          "Unable to synchronize campaign.",
+          true
+        );
+
+        console.error(error);
+      }
+    );
+  }
+
+  async function joinCampaign(name, code) {
+    const user = auth.currentUser;
+
+    if (!user || !user.isAnonymous) {
+      throw new Error("PLAYER_AUTH_REQUIRED");
+    }
+
+    const campaignRef = ref(
+      db,
+      "campaigns/" + code
+    );
+
+    const snapshot = await get(campaignRef);
+
+    if (!snapshot.exists()) {
+      throw new Error("CAMPAIGN_NOT_FOUND");
+    }
+
+    const playerRef = ref(
+      db,
+      "campaigns/" + code + "/players/" + user.uid
+    );
+
+    const existingPlayer = snapshot.child(
+      "players/" + user.uid
+    );
+
+    let savedName = name;
+
+    if (existingPlayer.exists()) {
+      savedName = existingPlayer.val().name || name;
+    } else {
+      try {
+        await set(playerRef, {
+          name: name,
+          joinedAt: Date.now()
+        });
+      } catch (error) {
+        // Another tab may have registered the same UID.
+        const latestPlayer = await get(playerRef);
+
+        if (!latestPlayer.exists()) {
+          throw error;
+        }
+
+        savedName = latestPlayer.val().name || name;
+      }
+    }
+
+    sessionStorage.setItem(
+      "campaignHQActiveCode",
+      code
+    );
+
+    sessionStorage.setItem(
+      "campaignHQPlayerName",
+      savedName
+    );
+
+    openCampaign(code, savedName);
+  }
+
+  $("joinForm").addEventListener(
+    "submit",
+    async event => {
+      event.preventDefault();
+
+      const name = $("playerName").value.trim();
+
+      const code = $("campaignCode")
+        .value.trim()
+        .toUpperCase();
+
+      if (!name || !code) {
+        showMessage(
+          "joinMessage",
+          "Please enter your name and campaign code.",
+          true
+        );
+        return;
+      }
+
+      $("joinButton").disabled = true;
+
+      showMessage(
+        "joinMessage",
+        "Joining campaign..."
+      );
+
+      try {
+        if (
+          auth.currentUser &&
+          !auth.currentUser.isAnonymous
+        ) {
+          throw new Error("ADMIN_SIGNED_IN");
+        }
+
+        if (!auth.currentUser) {
+          await signInAnonymously(auth);
+        }
+
+        await joinCampaign(name, code);
+
+        $("joinMessage").textContent = "";
+
+      } catch (error) {
+        let message = "Unable to join campaign.";
+
+        if (error.message === "CAMPAIGN_NOT_FOUND") {
+          message = "Campaign code not found.";
+        } else if (
+          error.message === "ADMIN_SIGNED_IN"
+        ) {
+          message =
+            "Please sign out of your administrator account first.";
+        } else if (
+          error.code === "PERMISSION_DENIED" ||
+          error.code === "permission-denied"
+        ) {
+          message =
+            "Campaign access denied. Please check the campaign code.";
+        }
+
+        showMessage("joinMessage", message, true);
+        console.error(error);
+
+      } finally {
+        $("joinButton").disabled = false;
+      }
+    }
+  );
+
+  $("leaveCampaignButton").addEventListener(
+    "click",
+    () => {
+      sessionStorage.removeItem(
+        "campaignHQActiveCode"
+      );
+
+      sessionStorage.removeItem(
+        "campaignHQPlayerName"
+      );
+
+      closeCampaignView();
+    }
+  );
+
+  onAuthStateChanged(auth, async user => {
     const isAdmin =
       user &&
       !user.isAnonymous &&
@@ -349,7 +670,6 @@
     );
 
     if (user && !user.isAnonymous) {
-
       $("loginForm").classList.add("hidden");
       $("accountPanel").classList.remove("hidden");
 
@@ -357,29 +677,70 @@
         ? "Administrator signed in: " + user.email
         : "Signed in without administrator permissions.";
 
-    } else {
+      closeCampaignView();
 
+    } else {
       $("accountPanel").classList.add("hidden");
       $("loginForm").classList.remove("hidden");
+    }
 
+    $("connectionStatus").textContent =
+      user
+        ? "Firebase authentication ready."
+        : "Firebase ready.";
+
+    $("connectionStatus").className =
+      "status success";
+
+    if (
+      user &&
+      user.isAnonymous &&
+      !activeCampaignCode &&
+      !restoringSession
+    ) {
+      const code = sessionStorage.getItem(
+        "campaignHQActiveCode"
+      );
+
+      const name = sessionStorage.getItem(
+        "campaignHQPlayerName"
+      );
+
+      if (code && name) {
+        restoringSession = true;
+
+        try {
+          await joinCampaign(name, code);
+        } catch (error) {
+          sessionStorage.removeItem(
+            "campaignHQActiveCode"
+          );
+
+          sessionStorage.removeItem(
+            "campaignHQPlayerName"
+          );
+
+          console.error(error);
+        } finally {
+          restoringSession = false;
+        }
+      }
     }
   });
 
   $("loginForm").addEventListener(
     "submit",
-    async (event) => {
-
+    async event => {
       event.preventDefault();
 
       $("loginButton").disabled = true;
 
-      $("adminMessage").textContent =
-        "Signing in...";
-
-      $("adminMessage").className = "status";
+      showMessage(
+        "adminMessage",
+        "Signing in..."
+      );
 
       try {
-
         await signInWithEmailAndPassword(
           auth,
           $("email").value.trim(),
@@ -389,18 +750,14 @@
         $("adminMessage").textContent = "";
 
       } catch (error) {
-
-        $("adminMessage").textContent =
-          "Sign-in failed. Please check your email and password.";
-
-        $("adminMessage").className =
-          "status error";
-
+        showMessage(
+          "adminMessage",
+          "Sign-in failed. Please check your email and password.",
+          true
+        );
       } finally {
-
         $("loginButton").disabled = false;
         $("password").value = "";
-
       }
     }
   );
@@ -408,112 +765,30 @@
   $("logoutButton").addEventListener(
     "click",
     async () => {
-
       try {
-
         await signOut(auth);
-
       } catch (error) {
-
-        $("adminMessage").textContent =
-          "Sign-out failed.";
-
-        $("adminMessage").className =
-          "status error";
-
-      }
-    }
-  );
-
-  $("joinForm").addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-      const name =
-        $("playerName").value.trim();
-
-      const code =
-        $("campaignCode").value.trim().toUpperCase();
-
-      if (!name || !code) {
-
-        $("joinMessage").textContent =
-          "Please enter your name and campaign code.";
-
-        $("joinMessage").className =
-          "status error";
-
-        return;
-      }
-
-      $("joinButton").disabled = true;
-
-      $("joinMessage").textContent =
-        "Preparing player access...";
-
-      $("joinMessage").className = "status";
-
-      try {
-
-        if (
-          auth.currentUser &&
-          !auth.currentUser.isAnonymous
-        ) {
-
-          $("joinMessage").textContent =
-            "Please sign out of your administrator account first.";
-
-          $("joinMessage").className =
-            "status error";
-
-          return;
-        }
-
-        if (!auth.currentUser) {
-
-          await signInAnonymously(auth);
-
-        }
-
-        $("joinMessage").textContent =
-          "Player access ready. Campaign joining is not available yet.";
-
-        $("joinMessage").className =
-          "status success";
-
-      } catch (error) {
-
-        $("joinMessage").textContent =
-          "Player sign-in failed. Please try again.";
-
-        $("joinMessage").className =
-          "status error";
-
-      } finally {
-
-        $("joinButton").disabled = false;
-
+        showMessage(
+          "adminMessage",
+          "Sign-out failed.",
+          true
+        );
       }
     }
   );
 
   function generateCode(prefix) {
-
     const bytes = new Uint32Array(1);
-
     crypto.getRandomValues(bytes);
 
     return prefix + "-" +
-      String(bytes[0] % 1000000).padStart(6, "0");
-
+      String(bytes[0] % 1000000)
+        .padStart(6, "0");
   }
 
   $("createForm").addEventListener(
     "submit",
-    async (event) => {
-
+    async event => {
       event.preventDefault();
 
       const user = auth.currentUser;
@@ -523,21 +798,16 @@
         user.uid !== ADMIN_UID ||
         user.isAnonymous
       ) {
-
-        $("createMessage").textContent =
-          "Administrator access required.";
-
-        $("createMessage").className =
-          "status error";
-
+        showMessage(
+          "createMessage",
+          "Administrator access required.",
+          true
+        );
         return;
       }
 
-      const type =
-        $("campaignType").value;
-
-      const mode =
-        $("gameMode").value;
+      const type = $("campaignType").value;
+      const mode = $("gameMode").value;
 
       const prefix =
         type === "stalingrad"
@@ -550,13 +820,12 @@
         "hidden"
       );
 
-      $("createMessage").textContent =
-        "Creating campaign...";
-
-      $("createMessage").className = "status";
+      showMessage(
+        "createMessage",
+        "Creating campaign..."
+      );
 
       try {
-
         let createdCode = null;
 
         for (
@@ -564,7 +833,6 @@
           attempt < 10;
           attempt++
         ) {
-
           const code = generateCode(prefix);
 
           const campaignRef = ref(
@@ -574,8 +842,7 @@
 
           const result = await runTransaction(
             campaignRef,
-            (currentData) => {
-
+            currentData => {
               if (currentData !== null) {
                 return;
               }
@@ -593,7 +860,6 @@
                   allies: 0
                 }
               };
-
             },
             {
               applyLocally: false
@@ -601,19 +867,15 @@
           );
 
           if (result.committed) {
-
             createdCode = code;
             break;
-
           }
         }
 
         if (!createdCode) {
-
           throw new Error(
             "Unable to generate a unique code."
           );
-
         }
 
         $("newCampaignCode").textContent =
@@ -623,26 +885,22 @@
           "hidden"
         );
 
-        $("createMessage").textContent =
-          "Campaign created successfully.";
-
-        $("createMessage").className =
-          "status success";
+        showMessage(
+          "createMessage",
+          "Campaign created successfully."
+        );
 
       } catch (error) {
-
-        $("createMessage").textContent =
-          "Campaign creation failed. Please try again.";
-
-        $("createMessage").className =
-          "status error";
+        showMessage(
+          "createMessage",
+          "Campaign creation failed. Please try again.",
+          true
+        );
 
         console.error(error);
 
       } finally {
-
         $("createButton").disabled = false;
-
       }
     }
   );
@@ -650,30 +908,23 @@
   $("copyCodeButton").addEventListener(
     "click",
     async () => {
-
       const code =
         $("newCampaignCode").textContent;
 
       try {
+        await navigator.clipboard.writeText(code);
 
-        await navigator.clipboard.writeText(
-          code
+        showMessage(
+          "createMessage",
+          "Campaign code copied."
         );
 
-        $("createMessage").textContent =
-          "Campaign code copied.";
-
-        $("createMessage").className =
-          "status success";
-
       } catch (error) {
-
-        $("createMessage").textContent =
-          "Please select and copy the code manually.";
-
-        $("createMessage").className =
-          "status error";
-
+        showMessage(
+          "createMessage",
+          "Please select and copy the code manually.",
+          true
+        );
       }
     }
   );
