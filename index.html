@@ -1,159 +1,242 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Campaign HQ</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campaign HQ</title>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+  * { box-sizing: border-box; }
 
-    body {
-      margin: 0;
-      background: #171c23;
-      color: #f5f5f5;
-      font-family: Arial, sans-serif;
-    }
+  body {
+    margin: 0;
+    background: #171c23;
+    color: #f5f5f5;
+    font-family: Arial, sans-serif;
+  }
 
-    header {
-      background: #252d38;
-      padding: 32px 16px;
-      text-align: center;
-      border-bottom: 3px solid #e6c477;
-    }
+  header {
+    background: #252d38;
+    padding: 30px 16px;
+    text-align: center;
+    border-bottom: 3px solid #e6c477;
+  }
 
-    h1 {
-      margin: 0;
-      letter-spacing: 3px;
-    }
+  h1 {
+    margin: 0;
+    letter-spacing: 3px;
+  }
 
-    header p { color: #c9c9c9; }
+  header p { color: #c9c9c9; }
 
-    main {
-      max-width: 560px;
-      margin: 35px auto;
-      padding: 0 16px;
-    }
+  main {
+    max-width: 680px;
+    margin: 30px auto;
+    padding: 0 16px;
+  }
 
-    .card {
-      background: #252d38;
-      border: 1px solid #b69a62;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 18px;
-    }
+  .card {
+    background: #252d38;
+    border: 1px solid #b69a62;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+  }
 
-    h2 { margin-top: 0; }
+  h2 { margin-top: 0; }
 
-    label {
-      display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+  h3 {
+    margin-top: 22px;
+    margin-bottom: 12px;
+  }
 
-    input, select {
-      width: 100%;
-      padding: 13px;
-      border-radius: 9px;
-      border: 2px solid #91a5bb;
-      background: #171c23;
-      color: white;
-      font-size: 16px;
-    }
+  label {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-weight: bold;
+  }
 
-    input:focus,
-    select:focus,
-    button:focus-visible {
-      outline: 3px solid #f3d895;
-      outline-offset: 2px;
-    }
+  input, select {
+    width: 100%;
+    padding: 13px;
+    border-radius: 9px;
+    border: 2px solid #91a5bb;
+    background: #171c23;
+    color: white;
+    font-size: 16px;
+  }
 
-    select { cursor: pointer; }
+  input:focus,
+  select:focus,
+  button:focus-visible {
+    outline: 3px solid #f3d895;
+    outline-offset: 2px;
+  }
 
-    button {
-      width: 100%;
-      margin-top: 20px;
-      padding: 15px;
-      border: 2px solid #f3d895;
-      border-radius: 9px;
-      background: #e6c477;
-      color: #17202b;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
-      transition: background .15s, transform .15s;
-    }
+  button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 15px;
+    border: 2px solid #f3d895;
+    border-radius: 9px;
+    background: #e6c477;
+    color: #17202b;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,.3);
+  }
 
-    button:active:not(:disabled) {
-      background: #f5d992;
-      transform: scale(.98);
-    }
+  button:active:not(:disabled) {
+    background: #f5d992;
+    transform: scale(.98);
+  }
 
-    button:disabled {
-      background: #353d47;
-      color: #929aa5;
-      border-color: #68717c;
-      box-shadow: none;
-      opacity: 1;
-      cursor: not-allowed;
-    }
+  button:disabled {
+    background: #353d47;
+    color: #929aa5;
+    border-color: #68717c;
+    box-shadow: none;
+    opacity: 1;
+    cursor: not-allowed;
+  }
 
-    .secondary {
-      background: #52657a;
-      color: white;
-      border-color: #91a5bb;
-    }
+  .secondary {
+    background: #52657a;
+    color: white;
+    border-color: #91a5bb;
+  }
 
-    .secondary:active:not(:disabled) {
-      background: #657b93;
-    }
+  .secondary:active:not(:disabled) {
+    background: #657b93;
+  }
 
-    .status {
-      margin-top: 16px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
+  .hidden { display: none !important; }
 
-    .success { color: #b9d8a2; }
-    .error { color: #ff9b9b; }
-    .hidden { display: none; }
+  .status {
+    margin-top: 15px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
 
-    .code {
-      font-size: 24px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      color: #b9d8a2;
-      overflow-wrap: anywhere;
-    }
+  .success { color: #b9d8a2; }
+  .error { color: #ff9b9b; }
+  .muted { color: #b9bec6; }
 
-    .campaign-details {
-      background: #171c23;
-      border: 1px solid #52657a;
-      border-radius: 9px;
-      padding: 16px;
-      line-height: 1.7;
-      margin-top: 16px;
-    }
+  .details {
+    background: #171c23;
+    border: 1px solid #52657a;
+    border-radius: 9px;
+    padding: 15px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
 
-    .campaign-details p {
-      margin: 5px 0;
-      overflow-wrap: anywhere;
-    }
+  .details p { margin: 3px 0; }
 
-    .player-list {
-      padding-left: 22px;
-      line-height: 1.9;
-    }
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
 
-    .note {
-      color: #b9bec6;
-      font-size: 13px;
-      text-align: center;
-      line-height: 1.6;
-    }
-  </style>
+  .stat {
+    background: #171c23;
+    border: 1px solid #52657a;
+    border-radius: 9px;
+    padding: 18px 12px;
+    text-align: center;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: #b9bec6;
+  }
+
+  .stat-value {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+
+  .progress-track {
+    height: 13px;
+    background: #171c23;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #52657a;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #e6c477;
+    transition: width .3s;
+  }
+
+  .scenario {
+    background: #171c23;
+    border: 1px solid #52657a;
+    border-radius: 9px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+
+  .scenario-title {
+    font-weight: bold;
+    line-height: 1.5;
+  }
+
+  .scenario-meta {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #b9bec6;
+  }
+
+  .tag {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #424b56;
+    color: #e5e8ed;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .tag.active {
+    background: #8a7140;
+    color: white;
+  }
+
+  .tag.complete {
+    background: #395c45;
+    color: #d3f2d9;
+  }
+
+  .player-list {
+    padding-left: 22px;
+    line-height: 1.9;
+  }
+
+  .code {
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #b9d8a2;
+    overflow-wrap: anywhere;
+  }
+
+  .note {
+    color: #b9bec6;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.6;
+  }
+</style>
 </head>
 
 <body>
@@ -171,20 +254,12 @@
 
     <form id="joinForm">
       <label for="playerName">Player Name</label>
-      <input
-        id="playerName"
-        maxlength="40"
-        autocomplete="nickname"
-        required
-      >
+      <input id="playerName" maxlength="40"
+             autocomplete="nickname" required>
 
       <label for="campaignCode">Campaign Code</label>
-      <input
-        id="campaignCode"
-        maxlength="40"
-        autocapitalize="characters"
-        required
-      >
+      <input id="campaignCode" maxlength="40"
+             autocapitalize="characters" required>
 
       <button id="joinButton" type="submit">
         Join Campaign
@@ -194,40 +269,90 @@
     <p id="joinMessage" class="status" role="status"></p>
   </section>
 
-  <section id="campaignPanel" class="card hidden">
-    <h2>Campaign Overview</h2>
+  <section id="campaignPanel" class="hidden">
 
-    <div class="campaign-details">
-      <p>
-        <strong>Campaign:</strong>
-        <span id="activeCampaignName"></span>
-      </p>
-      <p>
-        <strong>Game Mode:</strong>
-        <span id="activeCampaignMode"></span>
-      </p>
-      <p>
-        <strong>Campaign Code:</strong>
-        <span id="activeCampaignCode"></span>
-      </p>
-      <p>
-        <strong>Playing as:</strong>
-        <span id="activePlayerName"></span>
+    <div class="card">
+      <h2>Campaign Overview</h2>
+
+      <div class="details">
+        <p><strong>Campaign:</strong>
+          <span id="activeCampaignName"></span></p>
+        <p><strong>Game Mode:</strong>
+          <span id="activeCampaignMode"></span></p>
+        <p><strong>Campaign Code:</strong>
+          <span id="activeCampaignCode"></span></p>
+        <p><strong>Playing as:</strong>
+          <span id="activePlayerName"></span></p>
+      </div>
+
+      <p id="campaignMessage"
+         class="status" role="status"></p>
+    </div>
+
+    <div class="card">
+      <h2>Campaign Score</h2>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Axis Battle VP</div>
+          <div id="axisVP" class="stat-value">0</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Allies Battle VP</div>
+          <div id="alliesVP" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <p class="muted">
+        Territory bonuses will be calculated
+        when battle results are enabled.
       </p>
     </div>
 
-    <h3>Players</h3>
-    <ul id="playerList" class="player-list"></ul>
+    <div class="card">
+      <h2>Scenario Progress</h2>
 
-    <p id="campaignMessage" class="status" role="status"></p>
+      <p id="progressText">0 of 12 scenarios completed</p>
 
-    <button
-      id="leaveCampaignButton"
-      class="secondary"
-      type="button"
-    >
-      Leave Campaign View
-    </button>
+      <div class="progress-track">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+
+      <div id="scenarioList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Active Battles</h2>
+      <div id="activeBattles">
+        <p class="muted">No battles in progress.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Territory Control</h2>
+      <div id="territoryList">
+        <p class="muted">No territories claimed yet.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Game History</h2>
+      <div id="historyList">
+        <p class="muted">No completed battles yet.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Players</h2>
+      <ul id="playerList" class="player-list"></ul>
+
+      <button id="leaveCampaignButton"
+              class="secondary" type="button">
+        Leave Campaign View
+      </button>
+    </div>
+
   </section>
 
   <section class="card">
@@ -239,20 +364,12 @@
 
     <form id="loginForm" class="hidden">
       <label for="email">Email Address</label>
-      <input
-        id="email"
-        type="email"
-        autocomplete="username"
-        required
-      >
+      <input id="email" type="email"
+             autocomplete="username" required>
 
       <label for="password">Password</label>
-      <input
-        id="password"
-        type="password"
-        autocomplete="current-password"
-        required
-      >
+      <input id="password" type="password"
+             autocomplete="current-password" required>
 
       <button id="loginButton" type="submit">
         Admin Login
@@ -262,11 +379,8 @@
     <div id="accountPanel" class="hidden">
       <p id="accountInfo" class="status"></p>
 
-      <button
-        id="logoutButton"
-        class="secondary"
-        type="button"
-      >
+      <button id="logoutButton"
+              class="secondary" type="button">
         Sign Out
       </button>
     </div>
@@ -276,7 +390,7 @@
 
   <section id="createPanel" class="card hidden">
     <h2>Create Campaign</h2>
-    <p>Set up a new campaign and generate an access code.</p>
+    <p>Create a campaign and generate an access code.</p>
 
     <form id="createForm">
       <label for="campaignType">Campaign</label>
@@ -293,12 +407,8 @@
       <label for="gameMode">Game Mode</label>
 
       <select id="gameMode" required>
-        <option value="historical">
-          Historical Mode
-        </option>
-        <option value="dynamic">
-          Dynamic Mode
-        </option>
+        <option value="historical">Historical Mode</option>
+        <option value="dynamic">Dynamic Mode</option>
       </select>
 
       <button id="createButton" type="submit">
@@ -312,11 +422,8 @@
       <p>Your campaign code:</p>
       <p id="newCampaignCode" class="code"></p>
 
-      <button
-        id="copyCodeButton"
-        class="secondary"
-        type="button"
-      >
+      <button id="copyCodeButton"
+              class="secondary" type="button">
         Copy Campaign Code
       </button>
     </div>
@@ -324,610 +431,843 @@
 
   <p class="note">
     Campaign HQ – Development Version<br>
-    Campaign gameplay is coming soon.
+    Battle management is coming soon.
   </p>
 
 </main>
 
 <script type="module">
 
-  import { initializeApp } from
-    "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 
-  import {
-    getAuth,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signInAnonymously,
-    signOut
-  } from
-    "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInAnonymously,
+  signOut
+} from
+  "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 
-  import {
-    getDatabase,
-    ref,
-    get,
-    set,
-    onValue,
-    off,
-    runTransaction
-  } from
-    "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  get,
+  set,
+  onValue,
+  runTransaction
+} from
+  "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDZRTF-fjOZu4uKJy9OPMb27ZLWRNNmVts",
-    authDomain: "campaign-hq-12765.firebaseapp.com",
-    databaseURL: "https://campaign-hq-12765-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "campaign-hq-12765",
-    storageBucket: "campaign-hq-12765.firebasestorage.app",
-    messagingSenderId: "488850135352",
-    appId: "1:488850135352:web:ca42961977f50ed9a889cd"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyDZRTF-fjOZu4uKJy9OPMb27ZLWRNNmVts",
+  authDomain: "campaign-hq-12765.firebaseapp.com",
+  databaseURL: "https://campaign-hq-12765-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "campaign-hq-12765",
+  storageBucket: "campaign-hq-12765.firebasestorage.app",
+  messagingSenderId: "488850135352",
+  appId: "1:488850135352:web:ca42961977f50ed9a889cd"
+};
 
-  const ADMIN_UID = "rAl5A3mqGaZytHCImO6jxRKCtq92";
+const ADMIN_UID = "rAl5A3mqGaZytHCImO6jxRKCtq92";
 
-  const $ = (id) => document.getElementById(id);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getDatabase(app);
+const $ = id => document.getElementById(id);
 
-  let activeCampaignCode = null;
-  let activeCampaignRef = null;
-  let activeCampaignListener = null;
-  let restoringSession = false;
+const campaignNames = {
+  "battle-of-the-bulge": "Battle of the Bulge",
+  "stalingrad": "Stalingrad"
+};
 
-  const campaignNames = {
-    "battle-of-the-bulge": "Battle of the Bulge",
-    "stalingrad": "Stalingrad"
-  };
+const bulgeScenarios = [
+  "Retreat Through the Mons Pocket",
+  "The Battle of Hürtgen Forest",
+  "The Battle of St Vith",
+  "The Battle of Elsenborn Ridge",
+  "Kampfgruppe Peiper",
+  "The Siege of Bastogne",
+  "Operation Greif",
+  "The Battle of Foy",
+  "Bandit Country",
+  "Fogged Out",
+  "Defend the Bridge",
+  "The Colmar Pocket"
+];
 
-  function displayMode(mode) {
-    return mode === "historical"
-      ? "Historical Mode"
-      : "Dynamic Mode";
+let unsubscribeCampaign = null;
+let activeCode = null;
+let activePlayerName = null;
+let restoringSession = false;
+
+function showMessage(id, message, error = false) {
+  $(id).textContent = message;
+  $(id).className = error
+    ? "status error"
+    : "status success";
+}
+
+function modeName(mode) {
+  return mode === "historical"
+    ? "Historical Mode"
+    : "Dynamic Mode";
+}
+
+function campaignName(type) {
+  return campaignNames[type] || type || "Unknown Campaign";
+}
+
+function createElement(tag, className, text) {
+  const element = document.createElement(tag);
+
+  if (className) {
+    element.className = className;
   }
 
-  function showMessage(id, message, isError = false) {
-    $(id).textContent = message;
-    $(id).className = isError
-      ? "status error"
-      : "status success";
+  if (text !== undefined) {
+    element.textContent = text;
   }
 
-  function stopCampaignListener() {
-    if (activeCampaignRef && activeCampaignListener) {
-      off(activeCampaignRef, "value", activeCampaignListener);
+  return element;
+}
+
+function renderPlayers(players) {
+  const list = $("playerList");
+  list.replaceChildren();
+
+  const names = Object.values(players || {})
+    .map(player => player && player.name)
+    .filter(name => typeof name === "string")
+    .sort((a, b) => a.localeCompare(b, "en", {
+      sensitivity: "base"
+    }));
+
+  if (!names.length) {
+    list.appendChild(
+      createElement("li", "", "No players yet.")
+    );
+    return;
+  }
+
+  for (const name of names) {
+    list.appendChild(createElement("li", "", name));
+  }
+}
+
+function getBattles(campaign) {
+  return Object.entries(campaign.battles || {})
+    .filter(([, battle]) =>
+      battle && typeof battle === "object"
+    )
+    .map(([id, battle]) => ({
+      id,
+      ...battle
+    }));
+}
+
+function getScenarioId(battle) {
+  const id = Number(battle.scenarioId);
+
+  if (Number.isInteger(id)) {
+    return id;
+  }
+
+  const number = Number(battle.scenarioNumber);
+
+  return Number.isInteger(number) ? number : null;
+}
+
+function renderScenarios(campaign) {
+  const list = $("scenarioList");
+  list.replaceChildren();
+
+  if (campaign.type !== "battle-of-the-bulge") {
+    $("progressText").textContent =
+      "Scenario list not configured yet.";
+
+    $("progressFill").style.width = "0%";
+
+    list.appendChild(createElement(
+      "p",
+      "muted",
+      "This campaign will receive its own scenario rules."
+    ));
+
+    return;
+  }
+
+  const battles = getBattles(campaign);
+
+  const completed = new Set();
+  const active = new Set();
+
+  for (const battle of battles) {
+    const number = getScenarioId(battle);
+
+    if (number === null) continue;
+
+    if (battle.status === "completed") {
+      completed.add(number);
     }
 
-    activeCampaignRef = null;
-    activeCampaignListener = null;
-    activeCampaignCode = null;
+    if (battle.status === "active") {
+      active.add(number);
+    }
   }
 
-  function closeCampaignView() {
-    stopCampaignListener();
+  const count = bulgeScenarios.filter(
+    (_, index) => completed.has(index + 1)
+  ).length;
 
-    $("campaignPanel").classList.add("hidden");
-    $("joinPanel").classList.remove("hidden");
-    $("playerList").replaceChildren();
-    $("campaignMessage").textContent = "";
+  $("progressText").textContent =
+    count + " of 12 scenarios completed";
+
+  $("progressFill").style.width =
+    (count / 12 * 100) + "%";
+
+  bulgeScenarios.forEach((name, index) => {
+    const number = index + 1;
+
+    const item = createElement("div", "scenario");
+
+    const title = createElement(
+      "div",
+      "scenario-title",
+      String(number).padStart(2, "0") + " – " + name
+    );
+
+    item.appendChild(title);
+
+    let label = "Not Played";
+    let tagClass = "tag";
+
+    if (active.has(number)) {
+      label = "In Progress";
+      tagClass = "tag active";
+    } else if (completed.has(number)) {
+      label = "Previously Played";
+      tagClass = "tag complete";
+    }
+
+    item.appendChild(
+      createElement("span", tagClass, label)
+    );
+
+    list.appendChild(item);
+  });
+}
+
+function renderBattles(campaign) {
+  const activeContainer = $("activeBattles");
+  const historyContainer = $("historyList");
+
+  activeContainer.replaceChildren();
+  historyContainer.replaceChildren();
+
+  const battles = getBattles(campaign);
+
+  const active = battles.filter(
+    battle => battle.status === "active"
+  );
+
+  const completed = battles.filter(
+    battle => battle.status === "completed"
+  );
+
+  if (!active.length) {
+    activeContainer.appendChild(createElement(
+      "p", "muted", "No battles in progress."
+    ));
   }
 
-  function renderPlayers(players) {
-    const list = $("playerList");
-    list.replaceChildren();
+  for (const battle of active) {
+    const item = createElement("div", "scenario");
 
-    const names = Object.values(players || {})
-      .map(player => player && player.name)
-      .filter(name => typeof name === "string")
-      .sort((a, b) =>
-        a.localeCompare(b, "en", {
-          sensitivity: "base"
-        })
+    item.appendChild(createElement(
+      "div",
+      "scenario-title",
+      battle.scenarioName || "Active Battle"
+    ));
+
+    item.appendChild(createElement(
+      "span", "tag active", "In Progress"
+    ));
+
+    activeContainer.appendChild(item);
+  }
+
+  if (!completed.length) {
+    historyContainer.appendChild(createElement(
+      "p", "muted", "No completed battles yet."
+    ));
+  }
+
+  completed.sort((a, b) =>
+    Number(b.completedAt || 0) -
+    Number(a.completedAt || 0)
+  );
+
+  for (const battle of completed) {
+    const item = createElement("div", "scenario");
+
+    item.appendChild(createElement(
+      "div",
+      "scenario-title",
+      battle.scenarioName || "Completed Battle"
+    ));
+
+    const axis = Number(battle.axisVP || 0);
+    const allies = Number(battle.alliesVP || 0);
+
+    item.appendChild(createElement(
+      "div",
+      "scenario-meta",
+      "Axis: " + axis + " VP · Allies: " +
+      allies + " VP"
+    ));
+
+    historyContainer.appendChild(item);
+  }
+}
+
+function renderTerritories(campaign) {
+  const list = $("territoryList");
+  list.replaceChildren();
+
+  const territories = campaign.territories || {};
+  const entries = Object.entries(territories);
+
+  if (!entries.length) {
+    list.appendChild(createElement(
+      "p",
+      "muted",
+      "No territories claimed yet."
+    ));
+    return;
+  }
+
+  for (const [id, territory] of entries) {
+    if (!territory || typeof territory !== "object") {
+      continue;
+    }
+
+    const item = createElement("div", "scenario");
+
+    item.appendChild(createElement(
+      "div",
+      "scenario-title",
+      territory.name || id
+    ));
+
+    const owner = territory.owner === "axis"
+      ? "Axis"
+      : territory.owner === "allies"
+        ? "Allies"
+        : "Unclaimed";
+
+    item.appendChild(createElement(
+      "div",
+      "scenario-meta",
+      "Controlled by: " + owner
+    ));
+
+    list.appendChild(item);
+  }
+}
+
+function renderScore(campaign) {
+  const scores = campaign.scores || {};
+
+  // Existing saved VP are displayed here.
+  // Territory bonuses are not yet added.
+  $("axisVP").textContent =
+    Number(scores.axis || 0);
+
+  $("alliesVP").textContent =
+    Number(scores.allies || 0);
+}
+
+function renderCampaign(campaign) {
+  $("activeCampaignName").textContent =
+    campaignName(campaign.type);
+
+  $("activeCampaignMode").textContent =
+    modeName(campaign.mode);
+
+  renderPlayers(campaign.players);
+  renderScore(campaign);
+  renderScenarios(campaign);
+  renderBattles(campaign);
+  renderTerritories(campaign);
+
+  showMessage(
+    "campaignMessage",
+    "Campaign synchronized."
+  );
+}
+
+function closeCampaignView() {
+  if (unsubscribeCampaign) {
+    unsubscribeCampaign();
+    unsubscribeCampaign = null;
+  }
+
+  activeCode = null;
+  activePlayerName = null;
+
+  $("campaignPanel").classList.add("hidden");
+  $("joinPanel").classList.remove("hidden");
+}
+
+function openCampaign(code, playerName) {
+  closeCampaignView();
+
+  activeCode = code;
+  activePlayerName = playerName;
+
+  $("activeCampaignCode").textContent = code;
+  $("activePlayerName").textContent = playerName;
+
+  $("joinPanel").classList.add("hidden");
+  $("campaignPanel").classList.remove("hidden");
+
+  showMessage(
+    "campaignMessage",
+    "Loading campaign..."
+  );
+
+  const campaignRef = ref(
+    db, "campaigns/" + code
+  );
+
+  unsubscribeCampaign = onValue(
+    campaignRef,
+    snapshot => {
+      if (activeCode !== code) return;
+
+      if (!snapshot.exists()) {
+        showMessage(
+          "campaignMessage",
+          "Campaign no longer exists.",
+          true
+        );
+        return;
+      }
+
+      renderCampaign(snapshot.val());
+    },
+    error => {
+      if (activeCode !== code) return;
+
+      showMessage(
+        "campaignMessage",
+        "Unable to synchronize campaign.",
+        true
       );
 
-    if (names.length === 0) {
-      const item = document.createElement("li");
-      item.textContent = "No players yet.";
-      list.appendChild(item);
+      console.error(error);
+    }
+  );
+}
+
+async function joinCampaign(name, code) {
+  const user = auth.currentUser;
+
+  if (!user || !user.isAnonymous) {
+    throw new Error("PLAYER_AUTH_REQUIRED");
+  }
+
+  const campaignRef = ref(
+    db, "campaigns/" + code
+  );
+
+  const snapshot = await get(campaignRef);
+
+  if (!snapshot.exists()) {
+    throw new Error("CAMPAIGN_NOT_FOUND");
+  }
+
+  const playerRef = ref(
+    db,
+    "campaigns/" + code + "/players/" + user.uid
+  );
+
+  const existingPlayer = snapshot.child(
+    "players/" + user.uid
+  );
+
+  let savedName = name;
+
+  if (existingPlayer.exists()) {
+    savedName = existingPlayer.val().name || name;
+  } else {
+    try {
+      await set(playerRef, {
+        name,
+        joinedAt: Date.now()
+      });
+    } catch (error) {
+      const latest = await get(playerRef);
+
+      if (!latest.exists()) throw error;
+
+      savedName = latest.val().name || name;
+    }
+  }
+
+  sessionStorage.setItem(
+    "campaignHQActiveCode", code
+  );
+
+  sessionStorage.setItem(
+    "campaignHQPlayerName", savedName
+  );
+
+  openCampaign(code, savedName);
+}
+
+$("joinForm").addEventListener(
+  "submit",
+  async event => {
+    event.preventDefault();
+
+    const name = $("playerName").value.trim();
+    const code = $("campaignCode")
+      .value.trim().toUpperCase();
+
+    if (!name || !code) {
+      showMessage(
+        "joinMessage",
+        "Please enter your name and campaign code.",
+        true
+      );
       return;
     }
 
-    for (const name of names) {
-      const item = document.createElement("li");
-      item.textContent = name;
-      list.appendChild(item);
-    }
-  }
-
-  function openCampaign(code, playerName) {
-    closeCampaignView();
-
-    activeCampaignCode = code;
-    activeCampaignRef = ref(db, "campaigns/" + code);
-
-    $("activeCampaignCode").textContent = code;
-    $("activePlayerName").textContent = playerName;
-
-    $("joinPanel").classList.add("hidden");
-    $("campaignPanel").classList.remove("hidden");
+    $("joinButton").disabled = true;
 
     showMessage(
-      "campaignMessage",
-      "Loading campaign..."
+      "joinMessage",
+      "Joining campaign..."
     );
 
-    const currentRef = activeCampaignRef;
-
-    activeCampaignListener = onValue(
-      currentRef,
-      snapshot => {
-        if (activeCampaignRef !== currentRef) {
-          return;
-        }
-
-        if (!snapshot.exists()) {
-          showMessage(
-            "campaignMessage",
-            "This campaign no longer exists.",
-            true
-          );
-          return;
-        }
-
-        const campaign = snapshot.val();
-
-        $("activeCampaignName").textContent =
-          campaignNames[campaign.type] ||
-          campaign.type ||
-          "Unknown Campaign";
-
-        $("activeCampaignMode").textContent =
-          displayMode(campaign.mode);
-
-        renderPlayers(campaign.players);
-
-        showMessage(
-          "campaignMessage",
-          "Campaign synchronized."
-        );
-      },
-      error => {
-        if (activeCampaignRef !== currentRef) {
-          return;
-        }
-
-        showMessage(
-          "campaignMessage",
-          "Unable to synchronize campaign.",
-          true
-        );
-
-        console.error(error);
+    try {
+      if (
+        auth.currentUser &&
+        !auth.currentUser.isAnonymous
+      ) {
+        throw new Error("ADMIN_SIGNED_IN");
       }
+
+      if (!auth.currentUser) {
+        await signInAnonymously(auth);
+      }
+
+      await joinCampaign(name, code);
+
+      $("joinMessage").textContent = "";
+    } catch (error) {
+      let message = "Unable to join campaign.";
+
+      if (error.message === "CAMPAIGN_NOT_FOUND") {
+        message = "Campaign code not found.";
+      } else if (
+        error.message === "ADMIN_SIGNED_IN"
+      ) {
+        message =
+          "Please sign out of your administrator account first.";
+      } else if (
+        error.code === "PERMISSION_DENIED" ||
+        error.code === "permission-denied"
+      ) {
+        message = "Campaign access denied.";
+      }
+
+      showMessage("joinMessage", message, true);
+      console.error(error);
+    } finally {
+      $("joinButton").disabled = false;
+    }
+  }
+);
+
+$("leaveCampaignButton").addEventListener(
+  "click",
+  () => {
+    sessionStorage.removeItem(
+      "campaignHQActiveCode"
     );
+
+    sessionStorage.removeItem(
+      "campaignHQPlayerName"
+    );
+
+    closeCampaignView();
+  }
+);
+
+onAuthStateChanged(auth, async user => {
+  const isAdmin =
+    user &&
+    !user.isAnonymous &&
+    user.uid === ADMIN_UID;
+
+  $("createPanel").classList.toggle(
+    "hidden",
+    !isAdmin
+  );
+
+  if (user && !user.isAnonymous) {
+    $("loginForm").classList.add("hidden");
+    $("accountPanel").classList.remove("hidden");
+
+    $("accountInfo").textContent = isAdmin
+      ? "Administrator signed in: " + user.email
+      : "Signed in without administrator permissions.";
+
+    closeCampaignView();
+  } else {
+    $("accountPanel").classList.add("hidden");
+    $("loginForm").classList.remove("hidden");
   }
 
-  async function joinCampaign(name, code) {
-    const user = auth.currentUser;
+  $("connectionStatus").textContent =
+    user
+      ? "Firebase authentication ready."
+      : "Firebase ready.";
 
-    if (!user || !user.isAnonymous) {
-      throw new Error("PLAYER_AUTH_REQUIRED");
-    }
+  $("connectionStatus").className =
+    "status success";
 
-    const campaignRef = ref(
-      db,
-      "campaigns/" + code
+  if (
+    user &&
+    user.isAnonymous &&
+    !activeCode &&
+    !restoringSession
+  ) {
+    const code = sessionStorage.getItem(
+      "campaignHQActiveCode"
     );
 
-    const snapshot = await get(campaignRef);
-
-    if (!snapshot.exists()) {
-      throw new Error("CAMPAIGN_NOT_FOUND");
-    }
-
-    const playerRef = ref(
-      db,
-      "campaigns/" + code + "/players/" + user.uid
+    const name = sessionStorage.getItem(
+      "campaignHQPlayerName"
     );
 
-    const existingPlayer = snapshot.child(
-      "players/" + user.uid
-    );
-
-    let savedName = name;
-
-    if (existingPlayer.exists()) {
-      savedName = existingPlayer.val().name || name;
-    } else {
-      try {
-        await set(playerRef, {
-          name: name,
-          joinedAt: Date.now()
-        });
-      } catch (error) {
-        // Another tab may have registered the same UID.
-        const latestPlayer = await get(playerRef);
-
-        if (!latestPlayer.exists()) {
-          throw error;
-        }
-
-        savedName = latestPlayer.val().name || name;
-      }
-    }
-
-    sessionStorage.setItem(
-      "campaignHQActiveCode",
-      code
-    );
-
-    sessionStorage.setItem(
-      "campaignHQPlayerName",
-      savedName
-    );
-
-    openCampaign(code, savedName);
-  }
-
-  $("joinForm").addEventListener(
-    "submit",
-    async event => {
-      event.preventDefault();
-
-      const name = $("playerName").value.trim();
-
-      const code = $("campaignCode")
-        .value.trim()
-        .toUpperCase();
-
-      if (!name || !code) {
-        showMessage(
-          "joinMessage",
-          "Please enter your name and campaign code.",
-          true
-        );
-        return;
-      }
-
-      $("joinButton").disabled = true;
-
-      showMessage(
-        "joinMessage",
-        "Joining campaign..."
-      );
+    if (code && name) {
+      restoringSession = true;
 
       try {
-        if (
-          auth.currentUser &&
-          !auth.currentUser.isAnonymous
-        ) {
-          throw new Error("ADMIN_SIGNED_IN");
-        }
-
-        if (!auth.currentUser) {
-          await signInAnonymously(auth);
-        }
-
         await joinCampaign(name, code);
-
-        $("joinMessage").textContent = "";
-
       } catch (error) {
-        let message = "Unable to join campaign.";
+        sessionStorage.removeItem(
+          "campaignHQActiveCode"
+        );
 
-        if (error.message === "CAMPAIGN_NOT_FOUND") {
-          message = "Campaign code not found.";
-        } else if (
-          error.message === "ADMIN_SIGNED_IN"
-        ) {
-          message =
-            "Please sign out of your administrator account first.";
-        } else if (
-          error.code === "PERMISSION_DENIED" ||
-          error.code === "permission-denied"
-        ) {
-          message =
-            "Campaign access denied. Please check the campaign code.";
-        }
+        sessionStorage.removeItem(
+          "campaignHQPlayerName"
+        );
 
-        showMessage("joinMessage", message, true);
         console.error(error);
-
       } finally {
-        $("joinButton").disabled = false;
+        restoringSession = false;
       }
     }
-  );
+  }
+});
 
-  $("leaveCampaignButton").addEventListener(
-    "click",
-    () => {
-      sessionStorage.removeItem(
-        "campaignHQActiveCode"
-      );
+$("loginForm").addEventListener(
+  "submit",
+  async event => {
+    event.preventDefault();
 
-      sessionStorage.removeItem(
-        "campaignHQPlayerName"
-      );
+    $("loginButton").disabled = true;
 
-      closeCampaignView();
-    }
-  );
-
-  onAuthStateChanged(auth, async user => {
-    const isAdmin =
-      user &&
-      !user.isAnonymous &&
-      user.uid === ADMIN_UID;
-
-    $("createPanel").classList.toggle(
-      "hidden",
-      !isAdmin
+    showMessage(
+      "adminMessage",
+      "Signing in..."
     );
 
-    if (user && !user.isAnonymous) {
-      $("loginForm").classList.add("hidden");
-      $("accountPanel").classList.remove("hidden");
-
-      $("accountInfo").textContent = isAdmin
-        ? "Administrator signed in: " + user.email
-        : "Signed in without administrator permissions.";
-
-      closeCampaignView();
-
-    } else {
-      $("accountPanel").classList.add("hidden");
-      $("loginForm").classList.remove("hidden");
-    }
-
-    $("connectionStatus").textContent =
-      user
-        ? "Firebase authentication ready."
-        : "Firebase ready.";
-
-    $("connectionStatus").className =
-      "status success";
-
-    if (
-      user &&
-      user.isAnonymous &&
-      !activeCampaignCode &&
-      !restoringSession
-    ) {
-      const code = sessionStorage.getItem(
-        "campaignHQActiveCode"
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        $("email").value.trim(),
+        $("password").value
       );
 
-      const name = sessionStorage.getItem(
-        "campaignHQPlayerName"
-      );
-
-      if (code && name) {
-        restoringSession = true;
-
-        try {
-          await joinCampaign(name, code);
-        } catch (error) {
-          sessionStorage.removeItem(
-            "campaignHQActiveCode"
-          );
-
-          sessionStorage.removeItem(
-            "campaignHQPlayerName"
-          );
-
-          console.error(error);
-        } finally {
-          restoringSession = false;
-        }
-      }
-    }
-  });
-
-  $("loginForm").addEventListener(
-    "submit",
-    async event => {
-      event.preventDefault();
-
-      $("loginButton").disabled = true;
-
+      $("adminMessage").textContent = "";
+    } catch (error) {
       showMessage(
         "adminMessage",
-        "Signing in..."
+        "Sign-in failed. Please check your email and password.",
+        true
       );
-
-      try {
-        await signInWithEmailAndPassword(
-          auth,
-          $("email").value.trim(),
-          $("password").value
-        );
-
-        $("adminMessage").textContent = "";
-
-      } catch (error) {
-        showMessage(
-          "adminMessage",
-          "Sign-in failed. Please check your email and password.",
-          true
-        );
-      } finally {
-        $("loginButton").disabled = false;
-        $("password").value = "";
-      }
+    } finally {
+      $("loginButton").disabled = false;
+      $("password").value = "";
     }
-  );
-
-  $("logoutButton").addEventListener(
-    "click",
-    async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        showMessage(
-          "adminMessage",
-          "Sign-out failed.",
-          true
-        );
-      }
-    }
-  );
-
-  function generateCode(prefix) {
-    const bytes = new Uint32Array(1);
-    crypto.getRandomValues(bytes);
-
-    return prefix + "-" +
-      String(bytes[0] % 1000000)
-        .padStart(6, "0");
   }
+);
 
-  $("createForm").addEventListener(
-    "submit",
-    async event => {
-      event.preventDefault();
+$("logoutButton").addEventListener(
+  "click",
+  async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      showMessage(
+        "adminMessage",
+        "Sign-out failed.",
+        true
+      );
+    }
+  }
+);
 
-      const user = auth.currentUser;
+function generateCode(prefix) {
+  const bytes = new Uint32Array(1);
+  crypto.getRandomValues(bytes);
 
-      if (
-        !user ||
-        user.uid !== ADMIN_UID ||
-        user.isAnonymous
-      ) {
-        showMessage(
-          "createMessage",
-          "Administrator access required.",
-          true
+  return prefix + "-" +
+    String(bytes[0] % 1000000)
+      .padStart(6, "0");
+}
+
+$("createForm").addEventListener(
+  "submit",
+  async event => {
+    event.preventDefault();
+
+    const user = auth.currentUser;
+
+    if (
+      !user ||
+      user.uid !== ADMIN_UID ||
+      user.isAnonymous
+    ) {
+      showMessage(
+        "createMessage",
+        "Administrator access required.",
+        true
+      );
+      return;
+    }
+
+    const type = $("campaignType").value;
+    const mode = $("gameMode").value;
+
+    const prefix =
+      type === "stalingrad" ? "STAL" : "BULGE";
+
+    $("createButton").disabled = true;
+
+    $("createdCampaign").classList.add(
+      "hidden"
+    );
+
+    showMessage(
+      "createMessage",
+      "Creating campaign..."
+    );
+
+    try {
+      let createdCode = null;
+
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const code = generateCode(prefix);
+
+        const campaignRef = ref(
+          db, "campaigns/" + code
         );
-        return;
+
+        const result = await runTransaction(
+          campaignRef,
+          currentData => {
+            if (currentData !== null) return;
+
+            return {
+              type,
+              mode,
+              status: "setup",
+              createdBy: user.uid,
+              createdAt: Date.now(),
+              players: {},
+              games: {},
+              scores: {
+                axis: 0,
+                allies: 0
+              },
+              settings: {
+                territoryBonus: type ===
+                  "battle-of-the-bulge" ? 5 : 0
+              }
+            };
+          },
+          { applyLocally: false }
+        );
+
+        if (result.committed) {
+          createdCode = code;
+          break;
+        }
       }
 
-      const type = $("campaignType").value;
-      const mode = $("gameMode").value;
+      if (!createdCode) {
+        throw new Error(
+          "Unable to generate a unique code."
+        );
+      }
 
-      const prefix =
-        type === "stalingrad"
-          ? "STAL"
-          : "BULGE";
+      $("newCampaignCode").textContent =
+        createdCode;
 
-      $("createButton").disabled = true;
-
-      $("createdCampaign").classList.add(
+      $("createdCampaign").classList.remove(
         "hidden"
       );
 
       showMessage(
         "createMessage",
-        "Creating campaign..."
+        "Campaign created successfully."
+      );
+    } catch (error) {
+      showMessage(
+        "createMessage",
+        "Campaign creation failed. Please try again.",
+        true
       );
 
-      try {
-        let createdCode = null;
-
-        for (
-          let attempt = 0;
-          attempt < 10;
-          attempt++
-        ) {
-          const code = generateCode(prefix);
-
-          const campaignRef = ref(
-            db,
-            "campaigns/" + code
-          );
-
-          const result = await runTransaction(
-            campaignRef,
-            currentData => {
-              if (currentData !== null) {
-                return;
-              }
-
-              return {
-                type: type,
-                mode: mode,
-                status: "setup",
-                createdBy: user.uid,
-                createdAt: Date.now(),
-                players: {},
-                games: {},
-                scores: {
-                  axis: 0,
-                  allies: 0
-                }
-              };
-            },
-            {
-              applyLocally: false
-            }
-          );
-
-          if (result.committed) {
-            createdCode = code;
-            break;
-          }
-        }
-
-        if (!createdCode) {
-          throw new Error(
-            "Unable to generate a unique code."
-          );
-        }
-
-        $("newCampaignCode").textContent =
-          createdCode;
-
-        $("createdCampaign").classList.remove(
-          "hidden"
-        );
-
-        showMessage(
-          "createMessage",
-          "Campaign created successfully."
-        );
-
-      } catch (error) {
-        showMessage(
-          "createMessage",
-          "Campaign creation failed. Please try again.",
-          true
-        );
-
-        console.error(error);
-
-      } finally {
-        $("createButton").disabled = false;
-      }
+      console.error(error);
+    } finally {
+      $("createButton").disabled = false;
     }
-  );
+  }
+);
 
-  $("copyCodeButton").addEventListener(
-    "click",
-    async () => {
-      const code =
-        $("newCampaignCode").textContent;
+$("copyCodeButton").addEventListener(
+  "click",
+  async () => {
+    const code =
+      $("newCampaignCode").textContent;
 
-      try {
-        await navigator.clipboard.writeText(code);
+    try {
+      await navigator.clipboard.writeText(code);
 
-        showMessage(
-          "createMessage",
-          "Campaign code copied."
-        );
-
-      } catch (error) {
-        showMessage(
-          "createMessage",
-          "Please select and copy the code manually.",
-          true
-        );
-      }
+      showMessage(
+        "createMessage",
+        "Campaign code copied."
+      );
+    } catch (error) {
+      showMessage(
+        "createMessage",
+        "Please select and copy the code manually.",
+        true
+      );
     }
-  );
+  }
+);
 
 </script>
-
 </body>
 </html>
